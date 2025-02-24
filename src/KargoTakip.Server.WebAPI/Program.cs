@@ -1,4 +1,4 @@
-using System.Threading.RateLimiting;
+﻿using System.Threading.RateLimiting;
 using KargoTakip.Server.Application;
 using KargoTakip.Server.Infrastructure;
 using KargoTakip.Server.WebAPI;
@@ -67,7 +67,8 @@ app.UseCors(x => x
 .AllowAnyHeader()
 .AllowCredentials()
 .AllowAnyMethod()
-.SetIsOriginAllowed(t => true));
+.SetIsOriginAllowed(t => true)
+.SetPreflightMaxAge(TimeSpan.FromMinutes(10))); // İstek atılmadan önce gönderilen Options kontrolünü catch'ler ve bu sayede her istekte Options kontrolü yapmak yerine her 10dk da bi istek atar. Bu da performans artışına yol açar (5-10 ms)
 
 app.RegisterRoutes();
 

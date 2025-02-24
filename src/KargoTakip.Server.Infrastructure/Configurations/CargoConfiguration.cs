@@ -23,6 +23,8 @@ namespace KargoTakip.Server.Infrastructure.Configurations
 			});
 			builder.Property(p => p.CargoStatus).HasConversion(status => status.Value, value => CargoStatusEnum.FromValue(value));
 
+			builder.HasQueryFilter(x => !x.IsDeleted);
+
 		}
 	}
 }

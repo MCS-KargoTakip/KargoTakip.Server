@@ -12,7 +12,7 @@ namespace KargoTakip.Server.Application.Cargos
 		Person Sender,
 		Person Receiver,
 		Address DeliveryAddress,
-		CargoInformationDto CargoInfoDto) : IRequest<Result<string>>;
+		CargoInformationDto CargoInfo) : IRequest<Result<string>>;
 	
 	public sealed record CargoInformationDto(
 		int CargoTypeValue,
@@ -29,11 +29,10 @@ namespace KargoTakip.Server.Application.Cargos
 			RuleFor(p => p.DeliveryAddress.District).NotEmpty().WithMessage("Enter a valid district");
 			RuleFor(p => p.DeliveryAddress.Neighborhood).NotEmpty().WithMessage("Enter a valid neighborhood");
 			RuleFor(p => p.DeliveryAddress.FullAddress).NotEmpty().WithMessage("Enter a valid full address");
-			RuleFor(p => p.CargoInfoDto.CargoTypeValue)
+			RuleFor(p => p.CargoInfo.CargoTypeValue)
 				.GreaterThanOrEqualTo(0).WithMessage("Select a valid cargo type")
 				.LessThan(CargoTypeEnum.List.Count()).WithMessage("Select a valid cargo type");
 		}
-
 	}
 }
 
@@ -45,9 +44,11 @@ internal sealed class CargoCreateCommandHandler(
 	{
 		Cargo cargo = request.Adapt<Cargo>();
 		CargoInformation cargoInformation = new(
-			CargoTypeEnum.FromValue(request.CargoInfoDto.CargoTypeValue), request.CargoInfoDto.Weight);
+			CargoTypeEnum.FromValue(request.CargoInfo.CargoTypeValue), request.CargoInfo.Weight);
 		cargo.CargoInfo = cargoInformation;
 		cargo.CargoStatus = CargoStatusEnum.Pending;
+		cargo.Sender = request.Sender;
+		cargo.Receiver = request.Receiver;
 
 		cargoRepository.Add(cargo);
 		await unitOfWork.SaveChangesAsync(cancellationToken);

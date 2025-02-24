@@ -1,6 +1,8 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace KargoTakip.Server.Application.Behaviors;
 public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
@@ -20,6 +22,8 @@ public sealed class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<
             return await next();
         }
 
+		Console.WriteLine(JsonSerializer.Serialize(request, new JsonSerializerOptions { WriteIndented = true }));
+		
         var context = new ValidationContext<TRequest>(request);
 
         var errorDictionary = _validators
